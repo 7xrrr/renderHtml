@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Render HTML from Fetch</title>
+  <script>
+    (async () => {
+      const path = window.location.href;
+      const queryPart = path.split("?view?id=")[1];
+      if (!queryPart) {
+        console.error("No URL provided in the query string.");
+        return;
+      }
+
+      let url;
+      try {
+        url =`https://corsproxy.io/?`+ decodeURIComponent(atob(queryPart));
+      } catch (e) {
+        console.error("Failed to decode URL:", e);
+        return;
+      }
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.error("Failed to fetch:", response.status, response.statusText);
+          return;
+        }
+
+        const htmlText = await response.text();
+
+        // Overwrite the whole document body with the fetched HTML
+        document.open();
+        document.write(htmlText);
+        document.close();
+
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div>Loading...</div>
+</body>
+</html>
